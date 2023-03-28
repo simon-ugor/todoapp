@@ -1,123 +1,232 @@
+import Navbar from '@/components/navbar'
+import CollapseToDoItemNew from '@/components/collapseToDoItemNew'
+import CollapseToDoItem from '@/components/collapseToDoItem'
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import { useState, useEffect } from 'react'
+import { AiOutlineMinusCircle } from 'react-icons/ai';
+import DeleteWarning from '@/components/deleteWarning'
 
-const inter = Inter({ subsets: ['latin'] })
+export const getStaticProps = async () => {
+  const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists");
+  const data = await res.json();
 
-export default function Home() {
+  return {
+      props: { lists: data }
+  };
+}
+
+interface List {
+    id: number
+    name: string
+}
+
+interface HomeProps {
+  lists: Array<List>
+}
+
+interface Item {
+  id: string
+  listReferenceId: string
+  name: string
+  description: string
+  deadline: string
+}
+
+export default function Home({ lists }: HomeProps) {
+
+  useEffect(() => {
+    try {
+      fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items")
+      .then(res => res.json())
+      .then(data => setToDoItems([...data]))
+    } catch {
+      //solve this better!
+      //make it somehow so it does not render "no to dos text" until this fetch is done either with 200 or 400
+    }
+
+
+  }, []);
+
+  const [allLists, setAllLists] = useState([...lists])
+  const [toDoItems, setToDoItems] = useState<Item[]>([]);
+  const [listName, setListName] = useState({"name": lists[0].name, "id": lists[0].id.toString()});
+  const [newToDoHidden, setNewToDoHidden] = useState("hidden");
+  const [newListName, setNewListName] = useState("");
+  const [ulHidden, setUlHidden] = useState("hidden");
+  const [toggleNewList, setToggleNewList] = useState({"button": "", "input": "hidden"});
+  const [deleteWarningHidden, setDeleteWarningHidden] = useState("hidden");
+  const [listIdToDelete, setListIdToDelete] = useState("");
+
+  //new edits
+  const [chosenListId, setChosenListId] = useState(1);
+  const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
+
+  const toggleHidden = () => {
+    if (ulHidden == "hidden") {
+      setUlHidden("");
+    } else {
+      setUlHidden("hidden");
+      setToggleNewList({"button": "", "input": "hidden"})
+      setNewListName("");
+    }
+  }
+
+  const toggleNewListButton = () => {
+    if (toggleNewList.button == "") {
+      setToggleNewList({"button": "hidden", "input": ""})
+    }
+  }
+
+  const submitNewList = async () => {
+    const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists", {
+      method: "POST",
+      body: JSON.stringify({"name": newListName}),
+      headers: {
+          "Content-Type": "application/json"
+      }
+    })
+    const data = await res.json();
+
+    setAllLists([...allLists, {id: data.id, name: data.name}]);
+
+    setToggleNewList({"button": "", "input": "hidden"})
+    setNewListName("");
+
+  }
+
+  const newItem = (data: Item) => {
+    setToDoItems([...toDoItems, {id: data.id, name: data.name, description: data.description, deadline: data.deadline, listReferenceId: data.listReferenceId}])
+    setNewToDoHidden("hidden");
+  }
+
+  const hideNewToDo = () => {
+    setNewToDoHidden("hidden");
+  }
+
+  const listSwitch = (e: React.FormEvent<HTMLButtonElement>) => {
+    setListName({"name": e.currentTarget.value, "id": e.currentTarget.id.toString()});
+    setChosenListId(parseInt(e.currentTarget.id));
+    setUlHidden("hidden");
+  }
+
+  const cancelDelete = () => {
+    setDeleteWarningHidden("hidden");
+  }
+
+  // ------- DELETE -------
+
+  const deleteList = (e: React.FormEvent<HTMLButtonElement>) => {
+    //setListIdToDelete(e.currentTarget.id);
+    setToDelete({"whatToDelete": "list", "id": e.currentTarget.id})
+    setUlHidden("hidden");
+    setDeleteWarningHidden("");
+  }
+
+  const deleteTodo = (toDoId: string) => {
+    setToDelete({"whatToDelete": "todo", "id": toDoId});
+    setDeleteWarningHidden("");
+  }
+
+  const deleteApi = async () => {
+    if (toDelete.whatToDelete == "list") {
+      const resList = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists/" + toDelete.id, {
+        method: "DELETE"
+      })
+      const dataList = await resList.json();
+
+      let itemsToDeleteWithList = [""]
+      toDoItems.map((item) => {
+        if (item.listReferenceId == toDelete.id) {
+          itemsToDeleteWithList.push(item.id)
+        }
+      })
+  
+      //If currently selected list is deleted reset chosen list id as it cannot be rendered anymore
+      if (chosenListId.toString() == toDelete.id) {
+        setChosenListId(1);
+      }
+      //filter lists state and remove list with given id
+      setAllLists((allLists) => allLists.filter((list) => list.id.toString() != toDelete.id));
+      //DELETE ALL TODOS REFERENCED TO THE LIST
+      deleteItemsWithList(itemsToDeleteWithList);
+      
+    } else {
+      const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items/" + toDelete.id, {
+        method: "DELETE"
+      })
+      const dataItem = await resItem.json();
+
+      //filter items state and rmeove item with given id
+      setToDoItems((toDoItems) => toDoItems.filter((item) => item.id.toString() != toDelete.id))
+    }
+    //hide delete warning popup
+    setDeleteWarningHidden("hidden");
+  }
+
+  const deleteItemsWithList = async (itemsToDelete: string[]) => {
+    console.log(itemsToDelete)
+  }
+
   return (
     <>
       <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Generated by create next app" />
+        <title>ToDo App</title>
+        <meta name="description" content="ToDo Application" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>src/pages/index.tsx</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
+
+      <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
+
+      <div className='grid grid-rows-5 h-screen overflow-scroll w-full bg-neutral-content'>
+        <Navbar />
+        <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
+          <div className="flex-1 px-2 lg:flex-none">
+            <a className="text-lg font-bold">{allLists[chosenListId-1].name}</a>
           </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
+          <div className="flex justify-end flex-1 px-2">
+            <div className="flex items-stretch">
+              <div className="dropdown dropdown-end dropdown-open">
+                <button onClick={toggleHidden} className="btn btn-primary rounded-btn">&#x2193;</button>
+                <ul tabIndex={0} className={"menu dropdown-content p-2 shadow bg-base-100 rounded-box w-64 mt-4 " + ulHidden}>
+                  {allLists.map((list) => {
+                    return <li className='border-b-2 border-neutral-content w-full flex flex-row justify-between items-center' key={list.id}>
+                              <button className='w-9/12 h-min' onClick={listSwitch} value={list.name} id={list.id.toString()}>{list.name}</button>
+                              <button className='w-3/12 h-min' onClick={deleteList} id={list.id.toString()}><AiOutlineMinusCircle className='text-red-500 m-auto' /></button>
+                            </li>
+                    })} 
+                    <li>
+                      <button onClick={toggleNewListButton} className={"btn btn-primary w-full mt-3 " + toggleNewList.button}>Nový zoznam</button>
+                      <div className={'w-full ' + toggleNewList.input}>
+                        <input onChange={(e) => {setNewListName(e.currentTarget.value)}} value={newListName} type="text" placeholder="Názov zoznamu" className="input input-bordered w-full max-w-xs" />
+                        <button onClick={submitNewList} className="btn btn-primary w-min">+</button>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
+        
+
+        <div className='flex justify-center items-start hidden'>
+            <input type="text" placeholder="Search toDo" className="input w-11/12" />
         </div>
 
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
+        <div className='w-full h-min flex flex-col items-center overflow-scroll'>
+          { 
+            toDoItems.length > 0 ?
+            toDoItems.map((item: Item) => {
+              if (item.listReferenceId == chosenListId.toString()) {
+                return <CollapseToDoItem key={item.id} toDoTitle={item.name} toDoText={item.description} deadline={item.deadline} toDoId={item.id} deleteTodo={deleteTodo} />
+              } 
+            })
+          : <p className='text-primary-content'>Zatiaľ neboli pridané žiadne ToDos</p>
+          }
+          <CollapseToDoItemNew hidden={newToDoHidden} hide={hideNewToDo} referenceId={chosenListId.toString()} newItemUpdateState={newItem} />
+          <button onClick={() => {setNewToDoHidden("")}} className="btn btn-primary mt-4 mb-4">Pridať ToDo</button>
         </div>
-      </main>
+      </div>
     </>
   )
 }
