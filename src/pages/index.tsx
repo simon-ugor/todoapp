@@ -134,7 +134,7 @@ export default function Home({ lists }: HomeProps) {
       })
       const dataList = await resList.json();
 
-      let itemsToDeleteWithList = [""]
+      let itemsToDeleteWithList:string[] = []
       toDoItems.map((item) => {
         if (item.listReferenceId == toDelete.id) {
           itemsToDeleteWithList.push(item.id)
@@ -164,7 +164,15 @@ export default function Home({ lists }: HomeProps) {
   }
 
   const deleteItemsWithList = async (itemsToDelete: string[]) => {
-    console.log(itemsToDelete)
+    for (let i = 0; i < itemsToDelete.length; i++) {
+      const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items/" + itemsToDelete[i], {
+        method: "DELETE"
+      })
+      const data = await res.json();
+
+      setToDoItems((toDoItems) => toDoItems.filter((item) => item.id.toString() != itemsToDelete[i]))
+
+    }
   }
 
   return (
