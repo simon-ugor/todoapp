@@ -27,18 +27,19 @@ interface Item {
 export default function Home() {
 
   useEffect(() => {
-    try {
-      fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items")
-      .then(res => res.json())
-      .then(data => setToDoItems([...data]))
 
-      fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists")
-      .then(resLists => resLists.json())
-      .then(dataLists => setAllLists([...dataLists]))
-    } catch {
-      //solve this better!
-      //make it somehow so it does not render "no to dos text" until this fetch is done either with 200 or 400
-    }
+    Promise.all([
+      fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items"),
+      fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists"),
+    ])
+    .then (([resItems, resLists]) => 
+      Promise.all([resItems.json(), resLists.json()])
+    )
+    .then (([dataItems, dataLists]) => {
+      setToDoItems([...dataItems]);
+      setAllLists([...dataLists]);
+      setLoading(false);
+    })
   }, []);
 
   const [allLists, setAllLists] = useState<List[]>([]);
@@ -55,7 +56,8 @@ export default function Home() {
   //new edits
   const [chosenListId, setChosenListId] = useState(1);
   const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
-  const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([])
+  const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setToDoItemsFilter([...toDoItems])
@@ -279,13 +281,14 @@ export default function Home() {
 
         <div className='w-full h-min flex flex-col items-center overflow-scroll'>
           { 
-            toDoItemsFilter.length > 0 ?
-            toDoItemsFilter.map((item: Item) => {
+            loading ?
+            <p>načítavanie...</p>
+            : toDoItemsFilter.map((item: Item) => {
               if (item.listReferenceId == chosenListId.toString()) {
                 return <CollapseToDoItem key={item.id} toDoTitle={item.name} toDoText={item.description} deadline={item.deadline} toDoId={item.id} toDoCompleted={item.completed} deleteTodo={deleteTodo} updateTodo={updateItem} />
               } 
             })
-          : <p className='text-primary-content'>Zatiaľ neboli pridané žiadne ToDos</p>
+
           }
           <CollapseToDoItemNew hidden={newToDoHidden} hide={hideNewToDo} referenceId={chosenListId.toString()} newItemUpdateState={newItem} />
           <button onClick={() => {setNewToDoHidden("")}} className="btn btn-primary mt-4 mb-4">Pridať To-Do</button>

@@ -23,8 +23,8 @@ const DeleteWarning = ({ hidden, deleteClick, cancelClick, idToDelete }: Props) 
             <h2 className="card-title">Varovanie!</h2>
             <p>Táto akcia vymaže celý zoznam spolu so všetkými to-dos v danom zozname</p>
             <div className="card-actions justify-end">
-                <button onClick={deleteList} className="btn btn-primary">Delete</button>
-                <button onClick={setHidden} className="btn btn-primary">Cancel</button>
+                <button onClick={deleteList} className="btn btn-primary">Vymazať</button>
+                <button onClick={setHidden} className="btn btn-primary">Zrušiť</button>
             </div>
         </div>
     </div>
