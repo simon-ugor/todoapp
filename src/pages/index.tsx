@@ -201,9 +201,10 @@ export default function Home({ lists }: HomeProps) {
     }
   }
 
-  const searchTodos = () => {
-    //search functionality here
-    //get searched value with e.currentTarget.value and filter items somehow
+  const searchTodos = (e: React.FormEvent<HTMLInputElement>) => {
+    let value = e.currentTarget.value;
+    setToDoItemsFilter([...toDoItems]);
+    setToDoItemsFilter((toDoItemsFilter) => toDoItemsFilter.filter((item) => item.name.toLowerCase().startsWith(value.toLowerCase())));
   }
 
   const displayFilter = () => {
