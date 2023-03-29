@@ -5,6 +5,9 @@ import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { AiOutlineMinusCircle } from 'react-icons/ai';
 import DeleteWarning from '@/components/deleteWarning'
+import { z } from "zod";
+
+const schema = z.string().min(1, { message: "Názov nesmie byť prázdny" });
 
 export const getStaticProps = async () => {
   const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists");
@@ -44,8 +47,6 @@ export default function Home({ lists }: HomeProps) {
       //solve this better!
       //make it somehow so it does not render "no to dos text" until this fetch is done either with 200 or 400
     }
-
-
   }, []);
 
   const [allLists, setAllLists] = useState([...lists])
@@ -58,10 +59,14 @@ export default function Home({ lists }: HomeProps) {
   const [deleteWarningHidden, setDeleteWarningHidden] = useState("hidden");
   const [listIdToDelete, setListIdToDelete] = useState("");
   const [searchHidden, setSearchHidden] = useState("hidden");
+  const [filterHidden, setFilterHidden] = useState("hidden");
 
   //new edits
   const [chosenListId, setChosenListId] = useState(1);
   const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
+
+  //for filter and search purposes
+  const [toDoItemsCopy, setToDoItemsCopy] = useState<Item[]>([]);
 
   const toggleHidden = () => {
     if (ulHidden == "hidden") {
@@ -80,6 +85,13 @@ export default function Home({ lists }: HomeProps) {
   }
 
   const submitNewList = async () => {
+    /*
+    const zodTest = schema.safeParse("");
+    if (!zodTest.success) {
+      alert(typeof zodTest.error);
+    }
+    */
+
     const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists", {
       method: "POST",
       body: JSON.stringify({"name": newListName}),
@@ -196,6 +208,7 @@ export default function Home({ lists }: HomeProps) {
   const displaySearch = () => {
     if (searchHidden == "hidden") {
       setSearchHidden("");
+      setFilterHidden("hidden");
     } else {
       setSearchHidden("hidden");
     }
@@ -204,6 +217,28 @@ export default function Home({ lists }: HomeProps) {
   const searchTodos = () => {
     //search functionality here
     //get searched value with e.currentTarget.value and filter items somehow
+  }
+
+  const displayFilter = () => {
+    if (filterHidden == "hidden") {
+      setFilterHidden("");
+      setSearchHidden("hidden");
+    } else {
+      setFilterHidden("hidden");
+    }
+  }
+
+  const filterTodos = (e: React.FormEvent<HTMLButtonElement>) => {
+    const val = e.currentTarget.value;
+
+    if (val == "completed") {
+      setToDoItems((toDoItems) => toDoItems.filter((item) => item.completed == true));
+    } else if (val == "noncompleted") {
+      setToDoItems((toDoItems) => toDoItems.filter((item) => item.completed == false));
+    } else if (val == "all") {
+      //setToDoItems(initialState);
+    }
+    
   }
 
   return (
@@ -218,7 +253,7 @@ export default function Home({ lists }: HomeProps) {
       <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
 
       <div className='grid grid-rows-5 h-screen w-screen overflow-scroll bg-neutral-content'>
-        <Navbar searchClick={displaySearch} />
+        <Navbar searchClick={displaySearch} filterClick={displayFilter} />
         <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
           <div className="flex-1 px-2 lg:flex-none">
             <a className="text-lg font-bold">{allLists[chosenListId-1].name}</a>
@@ -250,6 +285,14 @@ export default function Home({ lists }: HomeProps) {
 
         <div className={'flex justify-center items-center ' + searchHidden}>
             <input onChange={searchTodos} type="text" placeholder="Hľadať to-do" className="input w-11/12" />
+        </div>
+        <div className={"dropdown w-11/12 flex justify-center items-center m-auto " + filterHidden}>
+          <label tabIndex={0} className="btn m-1 w-full">Vybrať filter &#x2193;</label>
+          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+            <li><button onClick={filterTodos} value="completed">Dokončené</button></li>
+            <li><button onClick={filterTodos} value="noncompleted">Nedokončené</button></li>
+            <li><button onClick={filterTodos} value="all">Všetky</button></li>
+          </ul>
         </div>
 
         <div className='w-full h-min flex flex-col items-center overflow-scroll'>

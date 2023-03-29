@@ -4,9 +4,10 @@ import { FiFilter } from "react-icons/fi"
 
 interface Props {
     searchClick: () => void
+    filterClick: () => void
 }
 
-const Navbar = ({ searchClick }: Props) => {
+const Navbar = ({ searchClick, filterClick }: Props) => {
   return (
     <div className="navbar bg-base-100 w-full">
     <div className="navbar-start">
@@ -25,7 +26,7 @@ const Navbar = ({ searchClick }: Props) => {
         <a className="btn btn-ghost normal-case text-xl">ToDo App</a>
     </div>
     <div className="navbar-end">
-        <button className="btn btn-ghost btn-circle">
+        <button className="btn btn-ghost btn-circle" onClick={filterClick}>
             <FiFilter className='h-4 w-4' />
         </button>
         <button className="btn btn-ghost btn-circle" onClick={searchClick}>
