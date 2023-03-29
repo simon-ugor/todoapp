@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
+import { toDoSchema } from '@/zodSchemas/zodSchemas';
 
 interface Item {
     id: string
@@ -26,18 +27,24 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: 
     const [toDoDeadline, setToDoDeadline] = useState("");
 
     const submitApi = async () => {
-        const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items", {
-            method: "POST",
-            body: JSON.stringify({"name": toDoName, "deadline": toDoDeadline, "listReferenceId": referenceId, "description": toDoDescription, "completed": false}),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        const dataItem = await resItem.json();
-        setToDoName("");
-        setToDoDescription("");
-        setToDoDeadline("");
-        newItemUpdateState(dataItem);
+        const zodTest = toDoSchema.safeParse({name: toDoName, desc: toDoDescription, deatetime: toDoDeadline});
+        if (!zodTest.success) {
+          //display error banner here
+          console.log(zodTest.error.formErrors.fieldErrors);
+        } else {
+            const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items", {
+                method: "POST",
+                body: JSON.stringify({"name": toDoName, "deadline": toDoDeadline, "listReferenceId": referenceId, "description": toDoDescription, "completed": false}),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            const dataItem = await resItem.json();
+            setToDoName("");
+            setToDoDescription("");
+            setToDoDeadline("");
+            newItemUpdateState(dataItem);
+        }
     }
 
     const discardClick = () => {
@@ -62,13 +69,12 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: 
   return (
     <div tabIndex={1} className={collapse + " " + hidden}>
         <div className="collapse-title text-xl font-medium bg-primary-focus">
-            <input onChange={toDoNameChange} value={toDoName} type="text" placeholder="Názov to-do" className="input border-0 w-full max-w-xs" />
+            <input onChange={toDoNameChange} value={toDoName} type="text" placeholder="Názov to-do" className="input border-0 w-full" />
         </div>
         <div className="collapse-content bg-primary">
-                {/* Add here functionality if user starts typing in first to do automatically display second to do */}
                 <label className="label cursor-pointer justify-start items-center flex-col">
                     <textarea onChange={descriptionChange} value={toDoDescription} className="textarea textarea-primary w-full mb-2" placeholder="Popis"></textarea>
-                    <input onChange={deadlineChange} value={toDoDeadline} type="text" placeholder="Deadline" className="input border-0 w-full max-w-xs" />
+                    <input onChange={deadlineChange} value={toDoDeadline} type="text" placeholder="Deadline (DD-MM-YYYY HH:MM)" className="input border-0 w-full" />
                 </label>
             <div className='w-full flex justify-center h-content mt-4'>
                 <button onClick={submitApi} className="btn btn-primary bg-base-100 mr-1">SAVE</button>

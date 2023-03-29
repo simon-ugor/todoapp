@@ -5,10 +5,9 @@ import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { AiOutlineMinusCircle } from 'react-icons/ai';
 import DeleteWarning from '@/components/deleteWarning'
-import { z } from "zod";
+import * as z from 'zod';
 import { deleteListApi, submitList, deleteItemApi } from "../api/api"
-
-const schema = z.string().min(1, { message: "Názov nesmie byť prázdny" });
+import { listNameSchema } from '@/zodSchemas/zodSchemas'
 
 interface List {
     id: number
@@ -80,20 +79,19 @@ export default function Home() {
   }
 
   const submitNewList = async () => {
-    /*
-    const zodTest = schema.safeParse("");
+
+    const zodTest = listNameSchema.safeParse(newListName);
     if (!zodTest.success) {
-      alert(typeof zodTest.error);
+      //display error banner here
+      console.log(zodTest.error.formErrors.formErrors[0]);
+    } else {
+      const data = await submitList(newListName);
+
+      setAllLists([...allLists, {id: data.id, name: data.name}]);
+  
+      setToggleNewList({"button": "", "input": "hidden"})
+      setNewListName("");
     }
-    */
-
-    const data = await submitList(newListName);
-
-    setAllLists([...allLists, {id: data.id, name: data.name}]);
-
-    setToggleNewList({"button": "", "input": "hidden"})
-    setNewListName("");
-
   }
 
   const newItem = (data: Item) => {
@@ -183,6 +181,7 @@ export default function Home() {
   // ------- SEARCH AND FILTER -------
 
   const displaySearch = () => {
+    setToDoItemsFilter([...toDoItems]);
     if (searchHidden == "hidden") {
       setSearchHidden("");
       setFilterHidden("hidden");
@@ -198,6 +197,7 @@ export default function Home() {
   }
 
   const displayFilter = () => {
+    setToDoItemsFilter([...toDoItems]);
     if (filterHidden == "hidden") {
       setFilterHidden("");
       setSearchHidden("hidden");
