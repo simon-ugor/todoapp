@@ -13,6 +13,11 @@ interface ToDoItem {
 
 const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted, deleteTodo, updateTodo }: ToDoItem) => {
 
+    useEffect(() => {
+        if (toDoCompleted == true) {
+            setCompleteButtonHidden("hidden");
+        }
+    }, [])
 
     const [collapse, setCollapse] = useState("collapse collapse-close collapse-arrow border border-primary rounded-box w-10/12 mt-2");
     const [isOpen, setIsOpen] = useState(false);
@@ -48,6 +53,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
         const data = await res.json();
         setCollapse("collapse collapse-close collapse-arrow border border-base-300 bg-primary rounded-box w-10/12 mt-2");
         setIsOpen(false);
+        setCompleteButtonHidden("hidden");
         updateTodo(toDoId);
     }
 
@@ -64,7 +70,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
             <p>{deadlineDate.getDate().toString() + "-" + deadlineDate.getMonth().toString() + "-" + deadlineDate.getFullYear().toString()}</p>
 
             <div className='w-full flex justify-center h-content mt-4'>
-                <button onClick={completeClick} className="btn bg-base-300 border-base-content ml-1">DOKONČIŤ</button>
+                <button onClick={completeClick} className={"btn bg-base-300 border-base-content ml-1 " + completeButtonHidden}>DOKONČIŤ</button>
                 <button onClick={deleteClick} className="btn bg-base-300 border-base-content ml-1">VYMAZAŤ</button>
             </div>
         </div>

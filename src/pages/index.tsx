@@ -57,6 +57,7 @@ export default function Home({ lists }: HomeProps) {
   const [toggleNewList, setToggleNewList] = useState({"button": "", "input": "hidden"});
   const [deleteWarningHidden, setDeleteWarningHidden] = useState("hidden");
   const [listIdToDelete, setListIdToDelete] = useState("");
+  const [searchHidden, setSearchHidden] = useState("hidden");
 
   //new edits
   const [chosenListId, setChosenListId] = useState(1);
@@ -190,6 +191,21 @@ export default function Home({ lists }: HomeProps) {
     setToDoItems([...newItems]);
   }
 
+  // ------- SEARCH AND FILTER -------
+
+  const displaySearch = () => {
+    if (searchHidden == "hidden") {
+      setSearchHidden("");
+    } else {
+      setSearchHidden("hidden");
+    }
+  }
+
+  const searchTodos = () => {
+    //search functionality here
+    //get searched value with e.currentTarget.value and filter items somehow
+  }
+
   return (
     <>
       <Head>
@@ -202,7 +218,7 @@ export default function Home({ lists }: HomeProps) {
       <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
 
       <div className='grid grid-rows-5 h-screen w-screen overflow-scroll bg-neutral-content'>
-        <Navbar />
+        <Navbar searchClick={displaySearch} />
         <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
           <div className="flex-1 px-2 lg:flex-none">
             <a className="text-lg font-bold">{allLists[chosenListId-1].name}</a>
@@ -232,8 +248,8 @@ export default function Home({ lists }: HomeProps) {
           </div>
         
 
-        <div className='flex justify-center items-start hidden'>
-            <input type="text" placeholder="Search toDo" className="input w-11/12" />
+        <div className={'flex justify-center items-center ' + searchHidden}>
+            <input onChange={searchTodos} type="text" placeholder="Hľadať to-do" className="input w-11/12" />
         </div>
 
         <div className='w-full h-min flex flex-col items-center overflow-scroll'>
@@ -247,7 +263,7 @@ export default function Home({ lists }: HomeProps) {
           : <p className='text-primary-content'>Zatiaľ neboli pridané žiadne ToDos</p>
           }
           <CollapseToDoItemNew hidden={newToDoHidden} hide={hideNewToDo} referenceId={chosenListId.toString()} newItemUpdateState={newItem} />
-          <button onClick={() => {setNewToDoHidden("")}} className="btn btn-primary mt-4 mb-4">Pridať ToDo</button>
+          <button onClick={() => {setNewToDoHidden("")}} className="btn btn-primary mt-4 mb-4">Pridať To-Do</button>
         </div>
       </div>
     </>
