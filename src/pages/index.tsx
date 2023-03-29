@@ -233,7 +233,7 @@ export default function Home() {
       <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
 
       <div className='grid grid-rows-5 h-screen w-screen overflow-scroll bg-neutral-content'>
-        <Navbar searchClick={displaySearch} filterClick={displayFilter} />
+        <Navbar searchClick={displaySearch} filterClick={displayFilter} searchFilterHidden={false} />
         <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
           <div className="flex-1 px-2 lg:flex-none">
             <p className="text-lg font-bold">{allLists.map((list) => {

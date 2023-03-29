@@ -12,7 +12,8 @@ module.exports = {
     extend: {
       gridTemplateRows: {
         "4": "10% 10% auto 10%",
-        "5": "15% 10% 10% auto 10%"
+        "5": "15% 10% 10% auto 10%",
+        "2": "15% auto"
       }
     },
   },
