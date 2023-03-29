@@ -10,22 +10,9 @@ import { deleteListApi, submitList, deleteItemApi } from "../api/api"
 
 const schema = z.string().min(1, { message: "Názov nesmie byť prázdny" });
 
-export const getStaticProps = async () => {
-  const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists");
-  const data = await res.json();
-
-  return {
-      props: { lists: data }
-  };
-}
-
 interface List {
     id: number
     name: string
-}
-
-interface HomeProps {
-  lists: Array<List>
 }
 
 interface Item {
@@ -37,22 +24,25 @@ interface Item {
   completed: boolean
 }
 
-export default function Home({ lists }: HomeProps) {
+export default function Home() {
 
   useEffect(() => {
     try {
       fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items")
       .then(res => res.json())
       .then(data => setToDoItems([...data]))
+
+      fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists")
+      .then(resLists => resLists.json())
+      .then(dataLists => setAllLists([...dataLists]))
     } catch {
       //solve this better!
       //make it somehow so it does not render "no to dos text" until this fetch is done either with 200 or 400
     }
   }, []);
 
-  const [allLists, setAllLists] = useState([...lists])
+  const [allLists, setAllLists] = useState<List[]>([]);
   const [toDoItems, setToDoItems] = useState<Item[]>([]);
-  const [listName, setListName] = useState({"name": lists[0].name, "id": lists[0].id.toString()});
   const [newToDoHidden, setNewToDoHidden] = useState("hidden");
   const [newListName, setNewListName] = useState("");
   const [ulHidden, setUlHidden] = useState("hidden");
@@ -114,7 +104,6 @@ export default function Home({ lists }: HomeProps) {
   }
 
   const listSwitch = (e: React.FormEvent<HTMLButtonElement>) => {
-    setListName({"name": e.currentTarget.value, "id": e.currentTarget.id.toString()});
     setChosenListId(parseInt(e.currentTarget.id));
     setUlHidden("hidden");
   }
@@ -126,7 +115,6 @@ export default function Home({ lists }: HomeProps) {
   // ------- DELETE -------
 
   const deleteList = (e: React.FormEvent<HTMLButtonElement>) => {
-    //setListIdToDelete(e.currentTarget.id);
     setToDelete({"whatToDelete": "list", "id": e.currentTarget.id})
     setUlHidden("hidden");
     setDeleteWarningHidden("");
