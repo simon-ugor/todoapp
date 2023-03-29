@@ -64,7 +64,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
             {toDoCompleted ? <p className='text-xs ml-2 text-neutral-content'>{"(" + "dokončené" + ")"}</p> 
             : <p className='text-xs ml-2 text-neutral-content'>{"(" + "nedokončené" + ")"}</p>} 
         </div>
-        <div className="collapse-content overflow-scroll">
+        <div className="collapse-content">
             
             <p>{toDoText}</p>
             <p>{deadlineDate.getDate().toString() + "-" + deadlineDate.getMonth().toString() + "-" + deadlineDate.getFullYear().toString()}</p>

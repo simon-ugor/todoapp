@@ -64,7 +64,7 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: 
         <div className="collapse-title text-xl font-medium bg-primary-focus">
             <input onChange={toDoNameChange} value={toDoName} type="text" placeholder="Názov to-do" className="input border-0 w-full max-w-xs" />
         </div>
-        <div className="collapse-content overflow-scroll bg-primary">
+        <div className="collapse-content bg-primary">
                 {/* Add here functionality if user starts typing in first to do automatically display second to do */}
                 <label className="label cursor-pointer justify-start items-center flex-col">
                     <textarea onChange={descriptionChange} value={toDoDescription} className="textarea textarea-primary w-full mb-2" placeholder="Popis"></textarea>

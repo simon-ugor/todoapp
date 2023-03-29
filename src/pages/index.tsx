@@ -232,7 +232,7 @@ export default function Home() {
 
       <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
 
-      <div className='grid grid-rows-5 h-screen w-screen overflow-scroll bg-neutral-content'>
+      <div className='h-screen w-screen grid grid-rows-5 bg-neutral-content'>
         <Navbar searchClick={displaySearch} filterClick={displayFilter} searchFilterHidden={false} />
         <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
           <div className="flex-1 px-2 lg:flex-none">
@@ -279,7 +279,7 @@ export default function Home() {
           </ul>
         </div>
 
-        <div className='w-full h-min flex flex-col items-center overflow-scroll'>
+        <div className='w-screen h-min flex flex-col items-center bg-neutral-content'>
           { 
             loading ?
             <p>načítavanie...</p>
