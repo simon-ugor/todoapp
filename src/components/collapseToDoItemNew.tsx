@@ -16,9 +16,10 @@ interface Props {
     referenceId: string
     hide: () => void
     newItemUpdateState: (data: Item) => void
+    showAlert: (text: string) => void
 }
 
-const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: Props) => {
+const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState, showAlert }: Props) => {
 
     const [collapse, setCollapse] = useState("collapse collapse-open collapse-arrow border border-base-300 bg-base-100 rounded-box w-10/12 mt-4");
 
@@ -27,10 +28,10 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: 
     const [toDoDeadline, setToDoDeadline] = useState("");
 
     const submitApi = async () => {
-        const zodTest = toDoSchema.safeParse({name: toDoName, desc: toDoDescription, deatetime: toDoDeadline});
+        const zodTest = toDoSchema.safeParse({name: toDoName, desc: toDoDescription, datetime: toDoDeadline});
         if (!zodTest.success) {
-          //display error banner here
-          console.log(zodTest.error.formErrors.fieldErrors);
+          const err = Object.values(zodTest.error.formErrors.fieldErrors)[0];
+          showAlert(Object.values(err)[0].toString());
         } else {
             const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items", {
                 method: "POST",
@@ -74,7 +75,7 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: 
         <div className="collapse-content bg-primary">
                 <label className="label cursor-pointer justify-start items-center flex-col">
                     <textarea onChange={descriptionChange} value={toDoDescription} className="textarea textarea-primary w-full mb-2" placeholder="Popis"></textarea>
-                    <input onChange={deadlineChange} value={toDoDeadline} type="text" placeholder="Deadline (DD-MM-YYYY HH:MM)" className="input border-0 w-full" />
+                    <input onChange={deadlineChange} value={toDoDeadline} type="text" placeholder="Deadline (MM-DD-YYYY)" className="input border-0 w-full" />
                 </label>
             <div className='w-full flex justify-center h-content mt-4'>
                 <button onClick={submitApi} className="btn btn-primary bg-base-100 mr-1">SAVE</button>

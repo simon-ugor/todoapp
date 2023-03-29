@@ -23,7 +23,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
     const [isOpen, setIsOpen] = useState(false);
     const [completeButtonHidden, setCompleteButtonHidden] = useState("");
 
-    const deadlineDate = new Date(deadline);
+    const deadlineDate = new Date(deadline.toString());
 
     const toggleCollapse = () => {
         if (isOpen == false) {
@@ -67,7 +67,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
         <div className="collapse-content">
             
             <p>{toDoText}</p>
-            <p>{deadlineDate.getDate().toString() + "-" + deadlineDate.getMonth().toString() + "-" + deadlineDate.getFullYear().toString()}</p>
+            <p>{deadlineDate.getDate().toString() + "-" + (deadlineDate.getMonth()+1).toString() + "-" + deadlineDate.getFullYear().toString()}</p>
 
             <div className='w-full flex justify-center h-content mt-4'>
                 <button onClick={completeClick} className={"btn bg-base-300 border-base-content ml-1 " + completeButtonHidden}>DOKONČIŤ</button>

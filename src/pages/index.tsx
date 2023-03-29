@@ -8,6 +8,7 @@ import DeleteWarning from '@/components/deleteWarning'
 import * as z from 'zod';
 import { deleteListApi, submitList, deleteItemApi } from "../api/api"
 import { listNameSchema } from '@/zodSchemas/zodSchemas'
+import Alert from '@/components/alert'
 
 interface List {
     id: number
@@ -57,6 +58,7 @@ export default function Home() {
   const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
   const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [alertText, setAlertText] = useState({"text": "", "hidden": "hidden"});
 
   useEffect(() => {
     setToDoItemsFilter([...toDoItems])
@@ -83,7 +85,7 @@ export default function Home() {
     const zodTest = listNameSchema.safeParse(newListName);
     if (!zodTest.success) {
       //display error banner here
-      console.log(zodTest.error.formErrors.formErrors[0]);
+      setAlertText({"text": zodTest.error.formErrors.formErrors[0], "hidden": ""})
     } else {
       const data = await submitList(newListName);
 
@@ -221,6 +223,14 @@ export default function Home() {
     
   }
 
+  const closeAlert = () => {
+    setAlertText({"text": "", "hidden": "hidden"});
+  }
+
+  const showAlert = (text: string) => {
+    setAlertText({"text": text, "hidden": ""});
+  }
+
   return (
     <>
       <Head>
@@ -231,6 +241,7 @@ export default function Home() {
       </Head>
 
       <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
+      <Alert alertText={alertText} alertFunc={closeAlert} />
 
       <div className='h-screen w-screen grid grid-rows-5 bg-neutral-content'>
         <Navbar searchClick={displaySearch} filterClick={displayFilter} searchFilterHidden={false} />
@@ -290,7 +301,7 @@ export default function Home() {
             })
 
           }
-          <CollapseToDoItemNew hidden={newToDoHidden} hide={hideNewToDo} referenceId={chosenListId.toString()} newItemUpdateState={newItem} />
+          <CollapseToDoItemNew hidden={newToDoHidden} hide={hideNewToDo} referenceId={chosenListId.toString()} newItemUpdateState={newItem} showAlert={showAlert} />
           <button onClick={() => {setNewToDoHidden("")}} className="btn btn-primary mt-4 mb-4">Pridať To-Do</button>
         </div>
       </div>
