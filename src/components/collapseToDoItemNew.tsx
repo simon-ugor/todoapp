@@ -7,6 +7,7 @@ interface Item {
     name: string
     description: string
     deadline: string
+    completed: boolean
 }
 
 interface Props {
@@ -27,7 +28,7 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState }: 
     const submitApi = async () => {
         const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items", {
             method: "POST",
-            body: JSON.stringify({"name": toDoName, "deadline": toDoDeadline, "listReferenceId": referenceId, "description": toDoDescription}),
+            body: JSON.stringify({"name": toDoName, "deadline": toDoDeadline, "listReferenceId": referenceId, "description": toDoDescription, "completed": false}),
             headers: {
                 "Content-Type": "application/json"
             }

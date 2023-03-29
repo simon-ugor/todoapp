@@ -30,6 +30,7 @@ interface Item {
   name: string
   description: string
   deadline: string
+  completed: boolean
 }
 
 export default function Home({ lists }: HomeProps) {
@@ -95,7 +96,7 @@ export default function Home({ lists }: HomeProps) {
   }
 
   const newItem = (data: Item) => {
-    setToDoItems([...toDoItems, {id: data.id, name: data.name, description: data.description, deadline: data.deadline, listReferenceId: data.listReferenceId}])
+    setToDoItems([...toDoItems, {id: data.id, name: data.name, description: data.description, deadline: data.deadline, listReferenceId: data.listReferenceId, completed: data.completed}])
     setNewToDoHidden("hidden");
   }
 
@@ -175,6 +176,20 @@ export default function Home({ lists }: HomeProps) {
     }
   }
 
+  // ------- UPDATE -------
+
+  const updateItem = (itemId: string) => {
+    const newItems = toDoItems.map((item) => {
+      if (item.id == itemId) {
+        item.completed = true;
+        return item
+      } else {
+        return item
+      }
+    })
+    setToDoItems([...newItems]);
+  }
+
   return (
     <>
       <Head>
@@ -186,7 +201,7 @@ export default function Home({ lists }: HomeProps) {
 
       <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
 
-      <div className='grid grid-rows-5 h-screen overflow-scroll w-full bg-neutral-content'>
+      <div className='grid grid-rows-5 h-screen w-screen overflow-scroll bg-neutral-content'>
         <Navbar />
         <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
           <div className="flex-1 px-2 lg:flex-none">
@@ -226,7 +241,7 @@ export default function Home({ lists }: HomeProps) {
             toDoItems.length > 0 ?
             toDoItems.map((item: Item) => {
               if (item.listReferenceId == chosenListId.toString()) {
-                return <CollapseToDoItem key={item.id} toDoTitle={item.name} toDoText={item.description} deadline={item.deadline} toDoId={item.id} deleteTodo={deleteTodo} />
+                return <CollapseToDoItem key={item.id} toDoTitle={item.name} toDoText={item.description} deadline={item.deadline} toDoId={item.id} toDoCompleted={item.completed} deleteTodo={deleteTodo} updateTodo={updateItem} />
               } 
             })
           : <p className='text-primary-content'>Zatiaľ neboli pridané žiadne ToDos</p>
