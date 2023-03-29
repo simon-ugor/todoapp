@@ -49,11 +49,11 @@ export default function Home() {
   const [ulHidden, setUlHidden] = useState("hidden");
   const [toggleNewList, setToggleNewList] = useState({"button": "", "input": "hidden"});
   const [deleteWarningHidden, setDeleteWarningHidden] = useState("hidden");
+  const [deleteText, setDeleteText] = useState("");
   const [listIdToDelete, setListIdToDelete] = useState("");
   const [searchHidden, setSearchHidden] = useState("hidden");
   const [filterHidden, setFilterHidden] = useState("hidden");
 
-  //new edits
   const [chosenListId, setChosenListId] = useState(1);
   const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
   const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([]);
@@ -80,11 +80,12 @@ export default function Home() {
     }
   }
 
+  // ------- SUBMIT NEW LIST -------
+
   const submitNewList = async () => {
 
     const zodTest = listNameSchema.safeParse(newListName);
     if (!zodTest.success) {
-      //display error banner here
       setAlertText({"text": zodTest.error.formErrors.formErrors[0], "hidden": ""})
     } else {
       const data = await submitList(newListName);
@@ -95,6 +96,8 @@ export default function Home() {
       setNewListName("");
     }
   }
+
+  // -------
 
   const newItem = (data: Item) => {
     setToDoItems([...toDoItems, {id: data.id, name: data.name, description: data.description, deadline: data.deadline, listReferenceId: data.listReferenceId, completed: data.completed}])
@@ -119,11 +122,13 @@ export default function Home() {
   const deleteList = (e: React.FormEvent<HTMLButtonElement>) => {
     setToDelete({"whatToDelete": "list", "id": e.currentTarget.id})
     setUlHidden("hidden");
+    setDeleteText("Táto akcia vymaže celý zoznam spolu so všetkými to-dos v danom zozname");
     setDeleteWarningHidden("");
   }
 
   const deleteTodo = (toDoId: string) => {
     setToDelete({"whatToDelete": "todo", "id": toDoId});
+    setDeleteText("Táto akcia vymaže zvolené to-do");
     setDeleteWarningHidden("");
   }
 
@@ -143,9 +148,9 @@ export default function Home() {
       if (chosenListId.toString() == toDelete.id) {
         setChosenListId(1);
       }
-      //filter lists state and remove list with given id
+      //Filter lists state and remove list with given id
       setAllLists((allLists) => allLists.filter((list) => list.id.toString() != toDelete.id));
-      //DELETE ALL TODOS REFERENCED TO THE LIST
+      //Delete all todos referenced to deleted list
       deleteItemsWithList(itemsToDeleteWithList);
       
     } else {
@@ -223,6 +228,8 @@ export default function Home() {
     
   }
 
+  // ------- ALERT -------
+
   const closeAlert = () => {
     setAlertText({"text": "", "hidden": "hidden"});
   }
@@ -240,7 +247,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <DeleteWarning hidden={deleteWarningHidden} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
+      <DeleteWarning hidden={deleteWarningHidden} text={deleteText} cancelClick={cancelDelete} deleteClick={deleteApi} idToDelete={listIdToDelete} />
       <Alert alertText={alertText} alertFunc={closeAlert} />
 
       <div className='h-screen w-screen grid grid-rows-5 bg-neutral-content'>
