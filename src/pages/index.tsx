@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { AiOutlineMinusCircle } from 'react-icons/ai';
 import DeleteWarning from '@/components/deleteWarning'
 import { z } from "zod";
+import { deleteListApi, submitList, deleteItemApi } from "../api/api"
 
 const schema = z.string().min(1, { message: "Názov nesmie byť prázdny" });
 
@@ -64,9 +65,11 @@ export default function Home({ lists }: HomeProps) {
   //new edits
   const [chosenListId, setChosenListId] = useState(1);
   const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
+  const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([])
 
-  //for filter and search purposes
-  const [toDoItemsCopy, setToDoItemsCopy] = useState<Item[]>([]);
+  useEffect(() => {
+    setToDoItemsFilter([...toDoItems])
+  }, [toDoItems])
 
   const toggleHidden = () => {
     if (ulHidden == "hidden") {
@@ -92,14 +95,7 @@ export default function Home({ lists }: HomeProps) {
     }
     */
 
-    const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists", {
-      method: "POST",
-      body: JSON.stringify({"name": newListName}),
-      headers: {
-          "Content-Type": "application/json"
-      }
-    })
-    const data = await res.json();
+    const data = await submitList(newListName);
 
     setAllLists([...allLists, {id: data.id, name: data.name}]);
 
@@ -143,10 +139,8 @@ export default function Home({ lists }: HomeProps) {
 
   const deleteApi = async () => {
     if (toDelete.whatToDelete == "list") {
-      const resList = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/lists/" + toDelete.id, {
-        method: "DELETE"
-      })
-      const dataList = await resList.json();
+
+      const dataList = await deleteListApi(toDelete.id);
 
       let itemsToDeleteWithList:string[] = []
       toDoItems.map((item) => {
@@ -165,10 +159,8 @@ export default function Home({ lists }: HomeProps) {
       deleteItemsWithList(itemsToDeleteWithList);
       
     } else {
-      const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items/" + toDelete.id, {
-        method: "DELETE"
-      })
-      const dataItem = await resItem.json();
+
+      const dataItem = await deleteItemApi(toDelete.id)
 
       //filter items state and rmeove item with given id
       setToDoItems((toDoItems) => toDoItems.filter((item) => item.id.toString() != toDelete.id))
@@ -179,13 +171,8 @@ export default function Home({ lists }: HomeProps) {
 
   const deleteItemsWithList = async (itemsToDelete: string[]) => {
     for (let i = 0; i < itemsToDelete.length; i++) {
-      const res = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items/" + itemsToDelete[i], {
-        method: "DELETE"
-      })
-      const data = await res.json();
-
+      const data = await deleteItemApi(itemsToDelete[i]);
       setToDoItems((toDoItems) => toDoItems.filter((item) => item.id.toString() != itemsToDelete[i]))
-
     }
   }
 
@@ -232,11 +219,13 @@ export default function Home({ lists }: HomeProps) {
     const val = e.currentTarget.value;
 
     if (val == "completed") {
-      setToDoItems((toDoItems) => toDoItems.filter((item) => item.completed == true));
+      setToDoItemsFilter([...toDoItems]);
+      setToDoItemsFilter((toDoItemsFilter) => toDoItemsFilter.filter((item) => item.completed == true));
     } else if (val == "noncompleted") {
-      setToDoItems((toDoItems) => toDoItems.filter((item) => item.completed == false));
+      setToDoItemsFilter([...toDoItems]);
+      setToDoItemsFilter((toDoItemsFilter) => toDoItemsFilter.filter((item) => item.completed == false));
     } else if (val == "all") {
-      //setToDoItems(initialState);
+      setToDoItemsFilter([...toDoItems]);
     }
     
   }
@@ -256,7 +245,11 @@ export default function Home({ lists }: HomeProps) {
         <Navbar searchClick={displaySearch} filterClick={displayFilter} />
         <div className="navbar bg-base-300 rounded-box w-11/12 m-auto mt-1">
           <div className="flex-1 px-2 lg:flex-none">
-            <a className="text-lg font-bold">{allLists[chosenListId-1].name}</a>
+            <p className="text-lg font-bold">{allLists.map((list) => {
+              if (chosenListId == list.id) {
+                return list.name;
+              }
+            })}</p>
           </div>
           <div className="flex justify-end flex-1 px-2">
             <div className="flex items-stretch">
@@ -297,8 +290,8 @@ export default function Home({ lists }: HomeProps) {
 
         <div className='w-full h-min flex flex-col items-center overflow-scroll'>
           { 
-            toDoItems.length > 0 ?
-            toDoItems.map((item: Item) => {
+            toDoItemsFilter.length > 0 ?
+            toDoItemsFilter.map((item: Item) => {
               if (item.listReferenceId == chosenListId.toString()) {
                 return <CollapseToDoItem key={item.id} toDoTitle={item.name} toDoText={item.description} deadline={item.deadline} toDoId={item.id} toDoCompleted={item.completed} deleteTodo={deleteTodo} updateTodo={updateItem} />
               } 
