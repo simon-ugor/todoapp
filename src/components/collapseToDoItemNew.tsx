@@ -75,7 +75,7 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState, sh
         <div className="collapse-content bg-primary">
                 <label className="label cursor-pointer justify-start items-center flex-col">
                     <textarea onChange={descriptionChange} value={toDoDescription} className="textarea textarea-primary w-full mb-2" placeholder="Popis"></textarea>
-                    <input onChange={deadlineChange} value={toDoDeadline} type="text" placeholder="Deadline (MM-DD-YYYY)" className="input border-0 w-full" />
+                    <input onChange={deadlineChange} value={toDoDeadline} type="text" placeholder="Deadline (YYYY-MM-DD)" className="input border-0 w-full" />
                 </label>
             <div className='w-full flex justify-center h-content mt-4'>
                 <button onClick={submitApi} className="btn btn-primary bg-base-100 mr-1">SAVE</button>
