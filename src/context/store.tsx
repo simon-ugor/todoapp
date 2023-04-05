@@ -1,63 +1,11 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from "react";
-
-interface List {
-    id: number
-    name: string
-}
-
-interface Item {
-    id: string
-    listReferenceId: string
-    name: string
-    description: string
-    deadline: string
-    completed: boolean
-  }
-
-type warningType = {
-    message: string
-    hidden: string
-}
-
-type toDeleteType = {
-    whatToDelete: string
-    id: string
-}
-
-type alertType = {
-    text: string
-    hidden: string
-}
-
-type warningContextType = {
-    warning: warningType
-    ulHidden: string
-    allLists: List[]
-    allItems: Item[]
-    allItemsInitial: Item[]
-    toDelete: toDeleteType
-    chosenListId: number
-    alertData: alertType
-    showDeleteListWarning: () => void
-    closeDeleteListWarning: () => void
-    toggleUlHidden: () => void
-    showDeleteItemWarning: () => void
-    setLists: (data: List[]) => void
-    appendList: (data: List) => void
-    setWhatToDelete: (type: string, id: string) => void
-    setItems: (data: Item[]) => void
-    setItemsInitial: (data: Item[]) => void
-    setChosenLiId: (listId: number) => void
-    setAlert: (text: string) => void
-    closeAlert: () => void
-}
+import { Item, List, warningType, toDeleteType, alertType, warningContextType } from "@/types/types";
 
 const warningDefaultValues: warningContextType = {
     warning: {"message": "", "hidden": "hidden"},
     ulHidden: "hidden",
     allLists: [],
     allItems: [],
-    allItemsInitial: [],
     toDelete: {"whatToDelete": "", id: ""},
     chosenListId: 1,
     alertData: {"text": "", "hidden": "hidden"},
@@ -69,7 +17,6 @@ const warningDefaultValues: warningContextType = {
     appendList: (data: List) => {},
     setWhatToDelete: (type: string, id: string) => {},
     setItems: (data: Item[]) => {},
-    setItemsInitial: (data: Item[]) => {},
     setChosenLiId: (listId: number) => {},
     setAlert: (text: string) => {},
     closeAlert: () => {},
@@ -91,7 +38,6 @@ export function WarningProvider({ children }: Props) {
     const [ulHidden, setUlHidden] = useState("hidden");
     const [allLists, setAllLists] = useState<List[]>([]);
     const [allItems, setAllItems] = useState<Item[]>([]);
-    const [allItemsInitial, setAllItemsInitial] = useState<Item[]>([]);
     const [toDelete, setToDelete] = useState({"whatToDelete": "", "id": ""});
     const [chosenListId, setChosenListId] = useState(1);
     const [alertData, setAlertData] = useState({"text": "", "hidden": "hidden"});
@@ -126,8 +72,6 @@ export function WarningProvider({ children }: Props) {
 
     const setItems = (data: Item[]) => { setAllItems([...data]) }
 
-    const setItemsInitial = (data: Item[]) => { setAllItemsInitial([...data]) }
-
     const setWhatToDelete = (type: string, id: string) => { setToDelete({"whatToDelete": type, "id": id}) }
 
     const setChosenLiId = (listId: number) => { setChosenListId(listId) }
@@ -140,7 +84,6 @@ export function WarningProvider({ children }: Props) {
         toDelete,
         chosenListId,
         alertData,
-        allItemsInitial,
         toggleUlHidden,
         showDeleteListWarning,
         closeDeleteListWarning,
@@ -152,7 +95,6 @@ export function WarningProvider({ children }: Props) {
         setChosenLiId,
         setAlert,
         closeAlert,
-        setItemsInitial
     }
 
     return (

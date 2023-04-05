@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { useWarning } from '@/context/store';
 
-interface ToDoItem {
+interface Props {
     toDoTitle: string
     toDoText: string
     deadline: string
@@ -10,7 +10,7 @@ interface ToDoItem {
     toDoCompleted: boolean
 }
 
-const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted }: ToDoItem) => {
+const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted }: Props) => {
 
     const { showDeleteItemWarning, setWhatToDelete, allItems, setItems } = useWarning();
 
@@ -24,7 +24,8 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
     const [isOpen, setIsOpen] = useState(false);
     const [completeButtonHidden, setCompleteButtonHidden] = useState("");
 
-    const deadlineDate = new Date(deadline.toString());
+    const deadlineSplit = deadline.replace("T", " ").replace(":00Z", "").split(" ");
+    const deadlineDate = deadlineSplit[0].split("-");
 
     const deleteItem = () => {
         showDeleteItemWarning()
@@ -69,7 +70,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
 
   return (
     <div tabIndex={0} className={collapse}>
-        <div onClick={toggleCollapse} className="collapse-title font-medium rounded-xl bg-primary-focus flex flex-row items-center justify-between">
+        <div onClick={toggleCollapse} className="collapse-title font-medium rounded-xl bg-primary-focus flex flex-row items-center justify-between cursor-pointer">
             <p className='text-xl'>{toDoTitle}</p>
             {toDoCompleted ? <p className='text-xs ml-2 text-neutral-content'>{"(" + "dokončené" + ")"}</p> 
             : <p className='text-xs ml-2 text-neutral-content'>{"(" + "nedokončené" + ")"}</p>} 
@@ -77,7 +78,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
         <div className="collapse-content">
             
             <p className='mt-1'>{"Popis: " + toDoText}</p>
-            <p className='mt-1'>{"Deadline: " + deadlineDate.getDate().toString() + "-" + (deadlineDate.getUTCMonth()+1).toString() + "-" + deadlineDate.getFullYear().toString() + " " + (deadlineDate.getUTCHours()) + ":" + deadlineDate.getUTCMinutes()}</p>
+            <p className='mt-1'>{"Deadline: " + deadlineDate[2] + "." + deadlineDate[1] + "." + deadlineDate[0] + " " + deadlineSplit[1]}</p>
 
             <div className='w-full flex justify-center h-content mt-4'>
                 <button onClick={completeClick} className={"btn bg-base-300 border-base-content ml-1 " + completeButtonHidden}>DOKONČIŤ</button>

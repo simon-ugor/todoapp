@@ -3,15 +3,7 @@ import { useState } from 'react'
 import CollapseToDoItem from './collapseToDoItem'
 import CollapseToDoItemNew from './collapseToDoItemNew'
 import { useWarning } from '@/context/store'
-
-interface Item {
-    id: string
-    listReferenceId: string
-    name: string
-    description: string
-    deadline: string
-    completed: boolean
-}
+import { Item } from '@/types/types'
 
 interface Props {
     toDoItemsFilter: Item[]
@@ -33,7 +25,7 @@ const ItemsSection = ({ toDoItemsFilter, loading }: Props) => {
     { 
       loading ?
       <p>načítavanie...</p>
-      : allItems.map((item: Item) => {
+      : toDoItemsFilter.map((item: Item) => {
         if (item.listReferenceId == chosenListId.toString()) {
           return <CollapseToDoItem key={item.id} toDoTitle={item.name} toDoText={item.description} deadline={item.deadline} toDoId={item.id} toDoCompleted={item.completed} />
         } 

@@ -2,29 +2,15 @@ import Navbar from '@/components/navbar'
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import DeleteWarning from '@/components/deleteWarning'
-import { deleteListApi, submitList, deleteItemApi } from "../api/api"
 import Alert from '@/components/alert'
 import ListSelector from '@/components/listSelector'
 import ItemsSection from '@/components/itemsSection'
 import { useWarning } from '@/context/store'
-
-interface Item {
-  id: string
-  listReferenceId: string
-  name: string
-  description: string
-  deadline: string
-  completed: boolean
-}
-
-interface List {
-  id: number
-  name: string
-}
+import { Item } from '@/types/types' 
 
 export default function Home() {
 
-  const { allLists, setLists, setItems, allItemsInitial, allItems, setItemsInitial } = useWarning();
+  const { setLists, setItems, allItems } = useWarning();
 
   useEffect(() => {
 
@@ -42,10 +28,13 @@ export default function Home() {
     })
   }, []);
 
-  const [toDoItems, setToDoItems] = useState<Item[]>([]);
+  useEffect(() => {
+    setToDoItemsFilter([...allItems])
+  }, [allItems])
+
   const [searchHidden, setSearchHidden] = useState("hidden");
   const [filterHidden, setFilterHidden] = useState("hidden");
-  const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([]);
+  const [toDoItemsFilter, setToDoItemsFilter] = useState<Item[]>([...allItems])
 
   //double check if this is working correctly
   const [loading, setLoading] = useState(true);
@@ -53,7 +42,6 @@ export default function Home() {
   // ------- SEARCH AND FILTER -------
 
   const displaySearch = () => {
-    setItemsInitial(allItems)
     if (searchHidden == "hidden") {
       setSearchHidden("");
       setFilterHidden("hidden");
@@ -64,15 +52,13 @@ export default function Home() {
 
   const searchTodos = (e: React.FormEvent<HTMLInputElement>) => {
     let value = e.currentTarget.value;
-    //setToDoItemsFilter([...toDoItems]);
-    //setToDoItemsFilter((toDoItemsFilter) => toDoItemsFilter.filter((item) => item.name.toLowerCase().startsWith(value.toLowerCase())));
-    let arr = allItems.filter((item) => item.name.toLowerCase().startsWith(value.toLowerCase()));
-    console.log(arr);
-    //setItems(arr);
+    setToDoItemsFilter([...allItems])
+    const filtered = allItems.filter((item) => item.name.toLowerCase().startsWith(value.toLowerCase()))
+    setToDoItemsFilter([...filtered])
+    console.log(toDoItemsFilter)
   }
 
   const displayFilter = () => {
-    setToDoItemsFilter([...toDoItems]);
     if (filterHidden == "hidden") {
       setFilterHidden("");
       setSearchHidden("hidden");
@@ -83,27 +69,27 @@ export default function Home() {
 
   const filterTodos = (e: React.FormEvent<HTMLButtonElement>) => {
     const val = e.currentTarget.value;
-
+    setToDoItemsFilter([...allItems])
     if (val == "completed") {
-      setToDoItemsFilter([...toDoItems]);
-      setToDoItemsFilter((toDoItemsFilter) => toDoItemsFilter.filter((item) => item.completed == true));
+        const filtered = allItems.filter((item) => item.completed == true)
+        setToDoItemsFilter([...filtered])
     } else if (val == "noncompleted") {
-      setToDoItemsFilter([...toDoItems]);
-      setToDoItemsFilter((toDoItemsFilter) => toDoItemsFilter.filter((item) => item.completed == false));
+      const filtered = allItems.filter((item) => item.completed == false)
+      setToDoItemsFilter([...filtered])
     } else if (val == "all") {
-      setToDoItemsFilter([...toDoItems]);
+      setToDoItemsFilter([...allItems])
     }
   }
 
   return (
     <>
-    
       <Head>
         <title>ToDo App</title>
         <meta name="description" content="ToDo Application" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <DeleteWarning />
       <Alert />
 
@@ -111,7 +97,6 @@ export default function Home() {
         <Navbar searchClick={displaySearch} filterClick={displayFilter} searchFilterHidden={false} />
         
         <ListSelector />
-        
 
         <div className={'flex justify-center items-center ' + searchHidden}>
             <input onChange={searchTodos} type="text" placeholder="Hľadať to-do" className="input w-11/12" />
