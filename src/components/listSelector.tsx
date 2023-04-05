@@ -3,11 +3,11 @@ import { useState } from 'react'
 import { AiOutlineMinusCircle } from 'react-icons/ai';
 import { submitList } from "../api/api"
 import { listNameSchema } from '@/zodSchemas/zodSchemas'
-import { useWarning } from '@/context/store';
+import { useAppContext } from '@/context/store';
 
 const ListSelector = () => {
 
-  const {showDeleteListWarning, ulHidden, toggleUlHidden, allLists, appendList, setWhatToDelete, setChosenLiId, chosenListId, setAlert} = useWarning();
+  const {showDeleteListWarning, ulHidden, toggleUlHidden, allLists, appendList, setWhatToDelete, setChosenLiId, chosenListId, setAlert} = useAppContext();
 
     const [toggleNewList, setToggleNewList] = useState({"button": "", "input": "hidden"});
     const [newListName, setNewListName] = useState("");

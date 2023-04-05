@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react';
-import { useWarning } from '@/context/store';
+import { useAppContext } from '@/context/store';
 
 interface Props {
     toDoTitle: string
@@ -12,7 +12,7 @@ interface Props {
 
 const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted }: Props) => {
 
-    const { showDeleteItemWarning, setWhatToDelete, allItems, setItems } = useWarning();
+    const { showDeleteItemWarning, setWhatToDelete, allItems, setItems } = useAppContext();
 
     useEffect(() => {
         if (toDoCompleted == true) {

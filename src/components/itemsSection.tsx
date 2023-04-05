@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 import CollapseToDoItem from './collapseToDoItem'
 import CollapseToDoItemNew from './collapseToDoItemNew'
-import { useWarning } from '@/context/store'
+import { useAppContext } from '@/context/store'
 import { Item } from '@/types/types'
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 
 const ItemsSection = ({ toDoItemsFilter, loading }: Props) => {
 
-  const { allItems, chosenListId } = useWarning();
+  const { allItems, chosenListId } = useAppContext();
 
     const [newToDoHidden, setNewToDoHidden] = useState("hidden");
 

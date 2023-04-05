@@ -5,12 +5,12 @@ import DeleteWarning from '@/components/deleteWarning'
 import Alert from '@/components/alert'
 import ListSelector from '@/components/listSelector'
 import ItemsSection from '@/components/itemsSection'
-import { useWarning } from '@/context/store'
+import { useAppContext } from '@/context/store'
 import { Item } from '@/types/types' 
 
 export default function Home() {
 
-  const { setLists, setItems, allItems } = useWarning();
+  const { setLists, setItems, allItems } = useAppContext();
 
   useEffect(() => {
 
@@ -55,7 +55,6 @@ export default function Home() {
     setToDoItemsFilter([...allItems])
     const filtered = allItems.filter((item) => item.name.toLowerCase().startsWith(value.toLowerCase()))
     setToDoItemsFilter([...filtered])
-    console.log(toDoItemsFilter)
   }
 
   const displayFilter = () => {

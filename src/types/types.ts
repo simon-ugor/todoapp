@@ -27,7 +27,7 @@ export type alertType = {
     hidden: string
 }
 
-export type warningContextType = {
+export type appContextType = {
     warning: warningType
     ulHidden: string
     allLists: List[]

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { toDoSchema } from '@/zodSchemas/zodSchemas';
-import { useWarning } from '@/context/store';
+import { useAppContext } from '@/context/store';
 
 interface Item {
     id: string
@@ -20,7 +20,7 @@ interface Props {
 
 const CollapseToDoItemNew = ({ hidden, hide, referenceId }: Props) => {
 
-    const { allItems, setItems, setAlert } = useWarning()
+    const { allItems, setItems, setAlert } = useAppContext()
 
     const [collapse, setCollapse] = useState("collapse collapse-open collapse-arrow border border-base-300 bg-base-100 rounded-box w-10/12 mt-4");
 

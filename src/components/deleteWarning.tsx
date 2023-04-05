@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { useWarning } from '@/context/store'
+import { useAppContext } from '@/context/store'
 import { deleteListApi, deleteItemApi } from '@/api/api'
 
 const DeleteWarning = () => {
 
-    const {warning, closeDeleteListWarning, toDelete, setItems,allItems, chosenListId, setChosenLiId, setLists, allLists} = useWarning();
+    const {warning, closeDeleteListWarning, toDelete, setItems,allItems, chosenListId, setChosenLiId, setLists, allLists} = useAppContext();
 
     const deleteApi = async () => {
         

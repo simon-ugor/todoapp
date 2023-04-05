@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { RxCrossCircled } from "react-icons/rx"
-import { useWarning } from '@/context/store'
+import { useAppContext } from '@/context/store'
 
 const Alert = () => {
 
-  const { alertData, closeAlert } = useWarning()
+  const { alertData, closeAlert } = useAppContext()
 
   return (
     <div className={"alert alert-error shadow-lg absolute top-0 left-0 z-50 flex flex-row justify-between content-center " + alertData.hidden}>

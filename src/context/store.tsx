@@ -1,7 +1,7 @@
-import { createContext, useContext, ReactNode, useState, useEffect } from "react";
-import { Item, List, warningType, toDeleteType, alertType, warningContextType } from "@/types/types";
+import { createContext, useContext, ReactNode, useState } from "react";
+import { Item, List, appContextType } from "@/types/types";
 
-const warningDefaultValues: warningContextType = {
+const appDefaultValues: appContextType = {
     warning: {"message": "", "hidden": "hidden"},
     ulHidden: "hidden",
     allLists: [],
@@ -22,10 +22,10 @@ const warningDefaultValues: warningContextType = {
     closeAlert: () => {},
 }
 
-const WarningContext = createContext<warningContextType>(warningDefaultValues);
+const AppContext = createContext<appContextType>(appDefaultValues);
 
-export function useWarning() {
-    return useContext(WarningContext);
+export function useAppContext() {
+    return useContext(AppContext);
 }
 
 type Props = {
@@ -99,9 +99,9 @@ export function WarningProvider({ children }: Props) {
 
     return (
         <>
-            <WarningContext.Provider value={value}>
+            <AppContext.Provider value={value}>
                 {children}
-            </WarningContext.Provider>
+            </AppContext.Provider>
         </>
     )
 
