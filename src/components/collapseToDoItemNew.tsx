@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { toDoSchema } from '@/zodSchemas/zodSchemas';
+import { useWarning } from '@/context/store';
 
 interface Item {
     id: string
@@ -15,11 +16,11 @@ interface Props {
     hidden: string
     referenceId: string
     hide: () => void
-    newItemUpdateState: (data: Item) => void
-    showAlert: (text: string) => void
 }
 
-const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState, showAlert }: Props) => {
+const CollapseToDoItemNew = ({ hidden, hide, referenceId }: Props) => {
+
+    const { allItems, setItems, setAlert } = useWarning()
 
     const [collapse, setCollapse] = useState("collapse collapse-open collapse-arrow border border-base-300 bg-base-100 rounded-box w-10/12 mt-4");
 
@@ -33,7 +34,7 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState, sh
         const zodTest = toDoSchema.safeParse({name: toDoName, desc: toDoDescription, datetime: deadlineParsed});
         if (!zodTest.success) {
           const err = Object.values(zodTest.error.formErrors.fieldErrors)[0];
-          showAlert(Object.values(err)[0].toString());
+          setAlert(Object.values(err)[0].toString());
         } else {
             const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items", {
                 method: "POST",
@@ -46,7 +47,8 @@ const CollapseToDoItemNew = ({ hidden, hide, referenceId, newItemUpdateState, sh
             setToDoName("");
             setToDoDescription("");
             setToDoDeadline({"day": "", "month": "", "year": "", "hours": "", "minutes": ""});
-            newItemUpdateState(dataItem);
+            setItems([...allItems, dataItem]);
+            hide();
         }
     }
 

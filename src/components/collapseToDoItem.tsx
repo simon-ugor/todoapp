@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react';
+import { useWarning } from '@/context/store';
 
 interface ToDoItem {
     toDoTitle: string
@@ -7,11 +8,11 @@ interface ToDoItem {
     deadline: string
     toDoId: string
     toDoCompleted: boolean
-    deleteTodo: (toDoTitle: string) => void
-    updateTodo: (toDoId: string) => void
 }
 
-const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted, deleteTodo, updateTodo }: ToDoItem) => {
+const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted }: ToDoItem) => {
+
+    const { showDeleteItemWarning, setWhatToDelete, allItems, setItems } = useWarning();
 
     useEffect(() => {
         if (toDoCompleted == true) {
@@ -25,6 +26,11 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
 
     const deadlineDate = new Date(deadline.toString());
 
+    const deleteItem = () => {
+        showDeleteItemWarning()
+        setWhatToDelete("item", toDoId)
+    }
+
     const toggleCollapse = () => {
         if (isOpen == false) {
             setCollapse("collapse collapse-open collapse-arrow border border-base-300 bg-primary rounded-box w-10/12 mt-2");
@@ -33,10 +39,6 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
             setCollapse("collapse collapse-close collapse-arrow border border-base-300 bg-primary rounded-box w-10/12 mt-2");
             setIsOpen(false)
         }  
-    }
-
-    const deleteClick = () => {
-        deleteTodo(toDoId);
     }
 
     const completeClick = async () => {
@@ -54,7 +56,15 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
         setCollapse("collapse collapse-close collapse-arrow border border-base-300 bg-primary rounded-box w-10/12 mt-2");
         setIsOpen(false);
         setCompleteButtonHidden("hidden");
-        updateTodo(toDoId);
+        const newItems = allItems.map((item) => {
+            if (data.id == item.id) {
+                item.completed = true;
+                return item
+            } else {
+                return item
+            }
+        })
+        setItems(newItems);
     }
 
   return (
@@ -71,7 +81,7 @@ const CollapseToDoItem = ({ toDoTitle, toDoText, deadline, toDoId, toDoCompleted
 
             <div className='w-full flex justify-center h-content mt-4'>
                 <button onClick={completeClick} className={"btn bg-base-300 border-base-content ml-1 " + completeButtonHidden}>DOKONČIŤ</button>
-                <button onClick={deleteClick} className="btn bg-base-300 border-base-content ml-1">VYMAZAŤ</button>
+                <button onClick={deleteItem} className="btn bg-base-300 border-base-content ml-1">VYMAZAŤ</button>
             </div>
         </div>
     </div>
