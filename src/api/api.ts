@@ -25,3 +25,15 @@ export async function deleteItemApi(id: string) {
     const dataItem = await resItem.json();
     return dataItem;
 }
+
+export async function submitToDo(name: string, desc: string, deadline: string, reference: string) {
+    const resItem = await fetch("https://641fa343ad55ae01ccbf4798.mockapi.io/api/v/items", {
+        method: "POST",
+        body: JSON.stringify({"name": name, "deadline": deadline, "listReferenceId": reference, "description": desc, "completed": false}),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    const dataItem = await resItem.json();
+    return dataItem;
+}
