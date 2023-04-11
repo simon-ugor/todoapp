@@ -22,6 +22,7 @@ const oaplikacii = () => {
                   <p>Zod</p>
                   <p>FetchAPI</p>
                   <p>Mockapi.io</p>
+                  <p>Formik</p>
                   <p>Vercel</p>
               </div>
           </div>
